@@ -23,7 +23,7 @@ public class UserMealsUtil {
                 new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
                 new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
         );
-        getFilteredWithExceededStream(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+        getFilteredWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
 
 //        .toLocalDate();
 //        .toLocalTime();
@@ -32,17 +32,11 @@ public class UserMealsUtil {
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> calculatedCalories = new HashMap<>();
         List<UserMealWithExceed> userMealWithExceeds = new ArrayList<>();
+        mealList.forEach(userMeal -> calculatedCalories.merge(userMeal.getDate(), userMeal.getCalories(), Integer::sum));
         mealList.forEach(userMeal -> {
-            calculatedCalories.merge(userMeal.getDate(), userMeal.getCalories(), Integer::sum);
             if (TimeUtil.isBetween(userMeal.getTime(), startTime, endTime)) {
-                userMealWithExceeds.add(new UserMealWithExceed(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), false));
+                userMealWithExceeds.add(new UserMealWithExceed(userMeal, calculatedCalories.get(userMeal.getDate()) > caloriesPerDay));
             }
-        });
-        userMealWithExceeds.replaceAll(userMealWithExceed -> {
-            if (calculatedCalories.get(userMealWithExceed.getDateTime().toLocalDate()) > caloriesPerDay) {
-                userMealWithExceed = new UserMealWithExceed(userMealWithExceed.getDateTime(), userMealWithExceed.getDescription(), userMealWithExceed.getCalories(), true);
-            }
-            return userMealWithExceed;
         });
         return userMealWithExceeds;
     }
@@ -51,13 +45,9 @@ public class UserMealsUtil {
         // так и не додумался как сделать в одно прохождение по начальному циклу
         Map<LocalDate, Integer> calculatedCalories;
         calculatedCalories = mealList.stream().collect(Collectors.groupingBy(UserMeal::getDate, Collectors.summingInt(UserMeal::getCalories)));
-        Map<LocalDate, Integer> finalCalculatedCalories = calculatedCalories;
-        List<UserMealWithExceed> filterdUserMeal = mealList.stream()
+        return mealList.stream()
                 .filter(userMeal -> TimeUtil.isBetween(userMeal.getTime(), startTime, endTime))
-                .map(userMeal -> new UserMealWithExceed(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), finalCalculatedCalories.get(userMeal.getDate()) > caloriesPerDay))
+                .map(userMeal -> new UserMealWithExceed(userMeal, calculatedCalories.get(userMeal.getDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
-
-
-        return filterdUserMeal;
     }
 }
