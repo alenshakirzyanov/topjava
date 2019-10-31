@@ -28,8 +28,8 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> calculatedCalories = new HashMap<>();
-        List<UserMealWithExceed> userMealWithExceeds = new ArrayList<>();
         mealList.forEach(userMeal -> calculatedCalories.merge(userMeal.getDate(), userMeal.getCalories(), Integer::sum));
+        List<UserMealWithExceed> userMealWithExceeds = new ArrayList<>();
         mealList.forEach(userMeal -> {
             if (TimeUtil.isBetween(userMeal.getTime(), startTime, endTime)) {
                 userMealWithExceeds.add(new UserMealWithExceed(userMeal, calculatedCalories.get(userMeal.getDate()) > caloriesPerDay));
@@ -41,7 +41,8 @@ public class UserMealsUtil {
     public static List<UserMealWithExceed> getFilteredWithExceededStream(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         // так и не додумался как сделать в одно прохождение по начальному циклу
         Map<LocalDate, Integer> calculatedCalories;
-        calculatedCalories = mealList.stream().collect(Collectors.groupingBy(UserMeal::getDate, Collectors.summingInt(UserMeal::getCalories)));
+        calculatedCalories = mealList.stream()
+                .collect(Collectors.groupingBy(UserMeal::getDate, Collectors.summingInt(UserMeal::getCalories)));
         return mealList.stream()
                 .filter(userMeal -> TimeUtil.isBetween(userMeal.getTime(), startTime, endTime))
                 .map(userMeal -> new UserMealWithExceed(userMeal, calculatedCalories.get(userMeal.getDate()) > caloriesPerDay))
