@@ -3,7 +3,7 @@
 <%@ taglib uri="http://sargue.net/jsptags/time" prefix="javatime" %>
 <html>
 <head>
-    <title>Meals</title>
+    <title>Meal</title>
 </head>
 <body>
 <h3><a href="index.html">Meals</a></h3>
@@ -15,18 +15,21 @@
     }
 </style>
 
-
+<c:set var="meal" value="${requestScope.meal}"/>
 <table>
     <tr>
+        <th style="display: none">id</th>
         <th>description</th>
         <th>dateTime</th>
         <th>calories</th>
     </tr>
     <form method=POST action="meals">
-        <td><input type="text" name="description"></td>
-        <td><input type="datetime-local" name="date"></td>
-        <td><input type="text" name="calories"></td>
-        <td><input type="submit" value="add"></td>
+        <tr>
+            <td style="display: none"><input type="hidden" name="mealId" value="${meal.getId()}">${meal.getId()}</td>
+            <td><input type="text" name="description" value="${meal.getDescription()}"></td>
+            <td><input type="datetime-local" name="date" value="${meal.getDateTime()}"></td>
+            <td><input type="text" name="calories" value="${meal.getCalories()}"></td>
+            <td><input type="submit" value="Submit"></td>
         </tr>
     </form>
 </table>
