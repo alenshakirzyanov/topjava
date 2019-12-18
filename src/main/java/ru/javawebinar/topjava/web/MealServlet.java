@@ -19,8 +19,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-//    private MealDaoMemoryList mealDaoMemoryList = new MealDaoMemoryList();
+    //    private MealDaoMemoryList mealDaoMemoryList = new MealDaoMemoryList();
     private MealDaoMap mealDaoMap = new MealDaoMap();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -28,13 +29,13 @@ public class MealServlet extends HttpServlet {
         String action = request.getParameter("action");
         List<MealTo> meals;
         int mealId;
-        if (action == null){
+        if (action == null) {
             action = "";
         }
         switch (action.toLowerCase()) {
             case "delete":
                 mealId = Integer.parseInt(request.getParameter("mealId"));
-                log.debug("mealId "+mealId);
+                log.debug("mealId " + mealId);
                 mealDaoMap.delete(mealId);
                 response.sendRedirect("meals");
                 break;
@@ -43,6 +44,7 @@ public class MealServlet extends HttpServlet {
                 Meal meal = mealDaoMap.getById(mealId);
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/meal.jsp").forward(request, response);
+                break;
             case "listmeals":
             default:
                 meals = MealsUtil.getFiltered(mealDaoMap.getAll(), LocalTime.MIN, LocalTime.MAX, MealsUtil.DEFAULT_CALORIES_PER_DAY);
@@ -64,7 +66,7 @@ public class MealServlet extends HttpServlet {
             mealDaoMap.create(new Meal(date, description, calories));
         } else {
             int mealIdInt = Integer.parseInt(mealId);
-            Meal meal = new Meal(mealIdInt,date,description,calories);
+            Meal meal = new Meal(mealIdInt, date, description, calories);
             mealDaoMap.updateById(mealIdInt, meal);
         }
         response.sendRedirect("meals");

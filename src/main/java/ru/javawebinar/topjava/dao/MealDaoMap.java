@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.dao;
 
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -11,14 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealDaoMap implements MealRepository {
-    private AtomicInteger id = new AtomicInteger(0);
+    private AtomicInteger atomicIntegerId = new AtomicInteger(0);
     private ConcurrentHashMap<Integer, Meal> meals = new ConcurrentHashMap<Integer, Meal>() {{
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500));
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000));
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500));
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000));
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500));
-        put(id.incrementAndGet(), new Meal(id.get(), LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500));
+        put(atomicIntegerId.incrementAndGet(), new Meal(atomicIntegerId.get(), LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510));
     }};
 
 
@@ -39,8 +38,9 @@ public class MealDaoMap implements MealRepository {
 
     @Override
     public void create(Meal meal) {
-        meal.setId(id.incrementAndGet());
-        meals.putIfAbsent(id.get(), meal);
+        int id = this.atomicIntegerId.getAndIncrement();
+        meal.setId(id);
+        meals.putIfAbsent(id, meal);
     }
 
     @Override
